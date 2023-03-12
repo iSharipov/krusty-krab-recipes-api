@@ -1,6 +1,10 @@
 name: Krusty Krab Recipes API CI
 
-on: [ push ]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -22,3 +26,18 @@ jobs:
           node-version: '15.x'
       - run: npm ci
       - run: npm run generate-api-client
+
+  publish-snapshot:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up settings.xml for GitHub Packages
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17'
+
+      - name: Publish SNAPSHOT version to GitHub Packages (we can skip tests since we only deploy if the build workflow succeeded)
+        run: mvn -B --no-transfer-progress deploy -DskipTests --projects cxf-spring-boot-starter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
