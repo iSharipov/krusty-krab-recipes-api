@@ -23,6 +23,18 @@
         <version>2.0.2</version>
     </parent>
 
+    <distributionManagement>
+        <repository>
+            <id>oss.sonatype.org</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/iSharipov/krusty-krab-recipes-api</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
