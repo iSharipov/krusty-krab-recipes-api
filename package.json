@@ -1,0 +1,27 @@
+{
+  "name": "krusty-krab-recipes-api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "pretest:coverage": "npm run generate-api-client",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --fix --ext .ts,.tsx",
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
+    "mock-api": "prism mock api/openapi.yaml -d -p 8090",
+    "pregenerate-api-client": "rimraf src/generated-sources",
+    "generate-api-client": "openapi-generator-cli generate -i api/openapi.yaml -g typescript-fetch -o src/generated-sources/openapi -c openapi.config.yaml"
+  },
+  "devDependencies": {
+    "@stoplight/prism-cli": "^4.10.5",
+    "husky": "^8.0.3",
+    "rimraf": "^4.0.4",
+    "@openapitools/openapi-generator-cli": "^2.5.2"
+  }
+}

@@ -1,0 +1,90 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'io.spring.dependency-management' version '1.1.0'
+//    id 'org.springframework.boot' version '3.0.4'
+    id 'org.openapi.generator' version '6.4.0'
+}
+
+//apply plugin: 'io.spring.dependency-management'
+
+group 'com.krustykrabrecipes'
+version '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+ext {
+    jacksonDatabindNullableVersion = "0.2.6"
+    hibernateValidatorVersion = "8.0.0.Final"
+    jakartaAnnotationsVersion = "2.1.1"
+    springdocOpenapiVersion = "2.0.2"
+    junitVersion = "5.8.1"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom('org.springdoc:springdoc-openapi:2.0.2') {
+            bomProperty 'version', '2.0.2'
+        }
+    }
+}
+
+dependencies {
+    compileOnly "jakarta.annotation:jakarta.annotation-api"
+    compileOnly "jakarta.servlet:jakarta.servlet-api"
+    compileOnly "com.fasterxml.jackson.core:jackson-annotations"
+    compileOnly "org.openapitools:jackson-databind-nullable:$jacksonDatabindNullableVersion"
+    compileOnly "org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocOpenapiVersion"
+    compileOnly "org.hibernate:hibernate-validator:$hibernateValidatorVersion"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+}
+
+var spec = "$rootDir/api/openapi.yaml".toString()
+var generatedSourcesDir = "$buildDir/generated/openapi".toString()
+
+compileJava.dependsOn "openApiGenerate"
+
+openApiGenerate {
+    generatorName.set("spring")
+
+    inputSpec.set(spec)
+    outputDir.set(generatedSourcesDir)
+
+    apiPackage.set("com.krustykrabrecipes.api.rest")
+    modelPackage.set("com.krustykrabrecipes.api.model")
+    typeMappings = [
+            Double: "java.math.BigDecimal"
+    ]
+    configOptions = [
+            dateLibrary              : "java8",
+            useSpringBoot3           : "true",
+            java8                    : "false",
+            delegatePattern          : "true",
+            supportingFilesToGenerate: "ApiUtil.java"
+    ]
+}
+
+sourceSets {
+    getByName("main") {
+        java {
+            srcDir("$generatedSourcesDir/src/main/java")
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
